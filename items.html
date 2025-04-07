@@ -1,0 +1,775 @@
+items
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supermarket Billing System</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      /* Updated vibrant gradient background */
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    /* Logout Button */
+    .logout-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .logout-btn {
+      background: linear-gradient(135deg, #ff6b6b, #ee5253);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(238, 82, 83, 0.2);
+    }
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(238, 82, 83, 0.3);
+      background: linear-gradient(135deg, #ff5252, #dd4444);
+    }
+    .logout-btn:active {
+      transform: translateY(0);
+    }
+    .logout-btn i {
+      font-size: 1.1em;
+    }
+    /* Container and Header */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      margin-top: 40px;
+    }
+    h1 {
+      text-align: center;
+      /* Updated header color */
+      color: #d35400;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      /* Updated gradient for header underline */
+      background: linear-gradient(to right, #e67e22, #d35400);
+      border-radius: 2px;
+    }
+    /* Form and Input Styles */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #34495e;
+      font-weight: 600;
+      font-size: 0.95em;
+      transition: all 0.3s ease;
+    }
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      background-color: #fff;
+    }
+    input:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.1);
+      outline: none;
+    }
+    .input-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    /* Buttons */
+    .add-item,
+    .get-bill {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .add-item {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      margin-top: 20px;
+    }
+    .get-bill {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      margin-top: 30px;
+    }
+    .add-item:hover,
+    .get-bill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    /* Item Card Styles */
+    .items-list {
+      margin-top: 30px;
+      border-top: 3px solid #f0f2f5;
+      padding-top: 20px;
+      display: grid;
+      grid-gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    .item-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      /* Updated vibrant left border color */
+      border-left: 5px solid #d35400;
+      position: relative;
+      overflow: hidden;
+    }
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    .item-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(211, 84, 0, 0.05));
+      pointer-events: none;
+    }
+    /* Remove Button for Each Item */
+    .remove-item {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8em;
+      margin-top: 10px;
+      transition: background 0.3s ease;
+    }
+    .remove-item:hover {
+      background: linear-gradient(135deg, #c0392b, #a93226);
+    }
+    /* Bill Container */
+    .bill-container {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .bill-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px dashed #e0e0e0;
+    }
+    .bill-header h2 {
+      color: #2c3e50;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .bill-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      background-color: white;
+    }
+    .bill-table th,
+    .bill-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .bill-table th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    .bill-table tr:hover {
+      background-color: #f8f9fa;
+    }
+    .total {
+      text-align: right;
+      font-size: 1.5em;
+      color: #2c3e50;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin-top: 0;
+      }
+      h1 {
+        font-size: 2em;
+      }
+      .items-list {
+        grid-template-columns: 1fr;
+      }
+      .logout-container {
+        position: relative;
+        top: 0;
+        right: 0;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    .success-animation {
+      animation: pulse 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="logout-container">
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+
+  <div class="container">
+    <h1>
+      <i class="fas fa-shopping-cart"></i>
+      Supermarket Billing
+    </h1>
+
+    <div class="input-group">
+      <div class="form-group">
+        <label for="itemName">
+          <i class="fas fa-tag"></i> Item Name
+        </label>
+        <input type="text" id="itemName" list="itemSuggestions" required placeholder="Enter item name" />
+        <datalist id="itemSuggestions">
+          <!-- Existing items -->
+          <option value="Milk"></option>
+          <option value="Bread"></option>
+          <option value="Eggs"></option>
+          <option value="Cheese"></option>
+          <option value="Butter"></option>
+          <option value="Yogurt"></option>
+          <option value="Apples"></option>
+          <option value="Bananas"></option>
+          <option value="Carrots"></option>
+          <option value="Chicken"></option>
+          <option value="Beef"></option>
+          <option value="Rice"></option>
+          <option value="Pasta"></option>
+          <option value="Tomatoes"></option>
+          <option value="Lettuce"></option>
+          <option value="Cereal"></option>
+          <!-- New supermarket items -->
+          <option value="Orange Juice"></option>
+          <option value="Soda"></option>
+          <option value="Chips"></option>
+          <option value="Chocolate"></option>
+          <option value="Toothpaste"></option>
+          <option value="Shampoo"></option>
+          <option value="Paper Towels"></option>
+          <option value="Laundry Detergent"></option>
+          <option value="Cookies"></option>
+          <option value="Frozen Pizza"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="itemPrice">
+          <i class="fas fa-rupee-sign"></i> Price
+        </label>
+        <input type="number" id="itemPrice" required placeholder="Enter price" />
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="form-group">
+        <label for="quantity">
+          <i class="fas fa-cubes"></i> Quantity
+        </label>
+        <input type="number" id="quantity" required placeholder="Enter quantity" />
+      </div>
+
+      <div class="form-group">
+        <label for="manufacturer">
+          <i class="fas fa-industry"></i> Manufacturer
+        </label>
+        <input type="text" id="manufacturer" required placeholder="Enter manufacturer" />
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="form-group">
+        <label for="mfgDate">
+          <i class="fas fa-calendar-plus"></i> Manufacturing Date
+        </label>
+        <input type="date" id="mfgDate" required />
+      </div>
+
+      <div class="form-group">
+        <label for="expDate">
+          <i class="fas fa-calendar-times"></i> Expiry Date
+        </label>
+        <input type="date" id="expDate" required />
+      </div>
+    </div>
+
+    <button class="add-item" onclick="addItem()">
+      <i class="fas fa-plus"></i> Add Item
+    </button>
+
+    <div class="items-list" id="itemsList"></div>
+
+    <button class="get-bill" onclick="generateBill()">
+      <i class="fas fa-file-invoice"></i> Generate Bill
+    </button>
+
+    <div class="bill-container" id="billContainer"></div>
+  </div>
+
+  <script>
+    // Predefined items available in the supermarket.
+    const predefinedItems = {
+      Milk: {
+        price: 40,
+        manufacturer: "Amul",
+        mfgDate: "2025-02-01",
+        expDate: "2025-02-10"
+      },
+      Bread: {
+        price: 30,
+        manufacturer: "Britannia",
+        mfgDate: "2025-02-05",
+        expDate: "2025-02-12"
+      },
+      Eggs: {
+        price: 5,
+        manufacturer: "Farm Fresh",
+        mfgDate: "2025-02-07",
+        expDate: "2025-02-17"
+      },
+      Cheese: {
+        price: 100,
+        manufacturer: "Cheddar",
+        mfgDate: "2025-02-02",
+        expDate: "2025-03-02"
+      },
+      Butter: {
+        price: 80,
+        manufacturer: "Amul",
+        mfgDate: "2025-02-03",
+        expDate: "2025-03-03"
+      },
+      Yogurt: {
+        price: 50,
+        manufacturer: "Danone",
+        mfgDate: "2025-02-04",
+        expDate: "2025-02-14"
+      },
+      Apples: {
+        price: 120,
+        manufacturer: "FreshFarms",
+        mfgDate: "2025-02-06",
+        expDate: "2025-02-16"
+      },
+      Bananas: {
+        price: 30,
+        manufacturer: "Tropical",
+        mfgDate: "2025-02-08",
+        expDate: "2025-02-18"
+      },
+      Carrots: {
+        price: 20,
+        manufacturer: "VeggieFarm",
+        mfgDate: "2025-02-09",
+        expDate: "2025-02-19"
+      },
+      Chicken: {
+        price: 150,
+        manufacturer: "Poultry Inc.",
+        mfgDate: "2025-02-10",
+        expDate: "2025-02-20"
+      },
+      Beef: {
+        price: 200,
+        manufacturer: "MeatCo",
+        mfgDate: "2025-02-11",
+        expDate: "2025-02-21"
+      },
+      Rice: {
+        price: 60,
+        manufacturer: "GrainCorp",
+        mfgDate: "2025-02-12",
+        expDate: "2026-02-12"
+      },
+      Pasta: {
+        price: 70,
+        manufacturer: "Italians",
+        mfgDate: "2025-02-13",
+        expDate: "2026-02-13"
+      },
+      Tomatoes: {
+        price: 25,
+        manufacturer: "VeggieFarm",
+        mfgDate: "2025-02-14",
+        expDate: "2025-02-24"
+      },
+      Lettuce: {
+        price: 35,
+        manufacturer: "GreenLeaf",
+        mfgDate: "2025-02-15",
+        expDate: "2025-02-25"
+      },
+      Cereal: {
+        price: 90,
+        manufacturer: "Kellogg's",
+        mfgDate: "2025-02-16",
+        expDate: "2025-08-16"
+      },
+      // New supermarket items
+      "Orange Juice": {
+        price: 80,
+        manufacturer: "Tropicana",
+        mfgDate: "2025-02-18",
+        expDate: "2025-03-05"
+      },
+      Soda: {
+        price: 50,
+        manufacturer: "Coca Cola",
+        mfgDate: "2025-02-10",
+        expDate: "2025-03-10"
+      },
+      Chips: {
+        price: 40,
+        manufacturer: "Lay's",
+        mfgDate: "2025-02-12",
+        expDate: "2025-08-12"
+      },
+      Chocolate: {
+        price: 60,
+        manufacturer: "Cadbury",
+        mfgDate: "2025-02-11",
+        expDate: "2025-07-11"
+      },
+      Toothpaste: {
+        price: 70,
+        manufacturer: "Colgate",
+        mfgDate: "2025-02-15",
+        expDate: "2027-02-15"
+      },
+      Shampoo: {
+        price: 120,
+        manufacturer: "Head & Shoulders",
+        mfgDate: "2025-02-16",
+        expDate: "2027-02-16"
+      },
+      "Paper Towels": {
+        price: 90,
+        manufacturer: "Bounty",
+        mfgDate: "2025-02-17",
+        expDate: "2027-02-17"
+      },
+      "Laundry Detergent": {
+        price: 150,
+        manufacturer: "Persil",
+        mfgDate: "2025-02-18",
+        expDate: "2027-02-18"
+      },
+      Cookies: {
+        price: 70,
+        manufacturer: "Oreo",
+        mfgDate: "2025-02-19",
+        expDate: "2025-08-19"
+      },
+      "Frozen Pizza": {
+        price: 200,
+        manufacturer: "DiGiorno",
+        mfgDate: "2025-02-20",
+        expDate: "2025-03-20"
+      }
+    };
+
+    let items = [];
+
+    document.getElementById("itemName").addEventListener("change", function () {
+      let name = this.value;
+      if (predefinedItems[name]) {
+        document.getElementById("itemPrice").value = predefinedItems[name].price;
+        document.getElementById("manufacturer").value = predefinedItems[name].manufacturer;
+        document.getElementById("mfgDate").value = predefinedItems[name].mfgDate;
+        document.getElementById("expDate").value = predefinedItems[name].expDate;
+      }
+    });
+
+    function addItem() {
+      const itemName = document.getElementById("itemName").value;
+      const itemPrice = document.getElementById("itemPrice").value;
+      const quantity = document.getElementById("quantity").value;
+      const manufacturer = document.getElementById("manufacturer").value;
+      const mfgDate = document.getElementById("mfgDate").value;
+      const expDate = document.getElementById("expDate").value;
+
+      if (!itemName || !itemPrice || !quantity || !manufacturer || !mfgDate || !expDate) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      const item = {
+        name: itemName,
+        price: parseFloat(itemPrice),
+        quantity: parseInt(quantity),
+        manufacturer,
+        mfgDate,
+        expDate
+      };
+
+      items.push(item);
+      displayItems();
+      clearForm();
+
+      const itemsList = document.getElementById("itemsList");
+      if (itemsList.lastElementChild)
+        itemsList.lastElementChild.classList.add("success-animation");
+    }
+
+    function displayItems() {
+      const itemsList = document.getElementById("itemsList");
+      itemsList.innerHTML = "";
+
+      items.forEach((item, index) => {
+        const itemCard = document.createElement("div");
+        itemCard.className = "item-card";
+        itemCard.innerHTML = `
+          <h3 style="color: #2c3e50; margin-bottom: 10px;">
+            <i class="fas fa-box"></i> ${item.name}
+          </h3>
+          <p style="color: #27ae60; font-size: 1.2em; margin-bottom: 10px;">
+            <i class="fas fa-rupee-sign"></i> ${item.price} x ${item.quantity}
+          </p>
+          <p style="color: #7f8c8d; margin-bottom: 5px;">
+            <i class="fas fa-industry"></i> ${item.manufacturer}
+          </p>
+          <p style="color: #7f8c8d; font-size: 0.9em;">
+            <i class="fas fa-calendar"></i> MFG: ${item.mfgDate}<br>
+            <i class="fas fa-calendar-times"></i> EXP: ${item.expDate}
+          </p>
+        `;
+
+        // Create and append remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "remove-item";
+        removeBtn.innerHTML = `<i class="fas fa-trash"></i> Remove`;
+        removeBtn.addEventListener("click", function() {
+          removeItem(index);
+        });
+        itemCard.appendChild(removeBtn);
+
+        itemsList.appendChild(itemCard);
+      });
+    }
+
+    function removeItem(index) {
+      // Remove the item from the list
+      items.splice(index, 1);
+      displayItems();
+
+      // If the bill is visible, update it automatically.
+      const billContainer = document.getElementById("billContainer");
+      if (billContainer.style.display === "block") {
+        if (items.length === 0) {
+          billContainer.style.display = "none";
+        } else {
+          generateBill();
+        }
+      }
+    }
+
+    function clearForm() {
+      document.getElementById("itemName").value = "";
+      document.getElementById("itemPrice").value = "";
+      document.getElementById("quantity").value = "";
+      document.getElementById("manufacturer").value = "";
+      document.getElementById("mfgDate").value = "";
+      document.getElementById("expDate").value = "";
+    }
+
+    function generateBill() {
+      if (items.length === 0) {
+        alert("Please add items first");
+        return;
+      }
+
+      const billContainer = document.getElementById("billContainer");
+      billContainer.style.display = "block";
+
+      let total = 0;
+      const currentDate = new Date().toLocaleDateString();
+      const billNumber = Math.floor(Math.random() * 1000000);
+
+      let billHTML = `
+        <div class="bill-header">
+          <h2><i class="fas fa-file-invoice"></i> INVOICE</h2>
+          <p style="color: #7f8c8d;">Bill No: #${billNumber}</p>
+          <p style="color: #7f8c8d;">Date: ${currentDate}</p>
+        </div>
+        <table class="bill-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      items.forEach((item) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        billHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>?${item.price.toFixed(2)}</td>
+            <td>${item.quantity}</td>
+            <td>?${itemTotal.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      billHTML += `
+          </tbody>
+        </table>
+        <div class="total">
+          <span style="color: #7f8c8d;">Total Amount:</span>
+          <span style="color: #27ae60; font-weight: bold;">?${total.toFixed(2)}</span>
+        </div>
+        <p style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+          <i class="fas fa-heart" style="color: #e74c3c;"></i>
+          Thank you for shopping with us!
+        </p>
+        <button class="get-bill" onclick="printBill()">
+          <i class="fas fa-print"></i> Print Bill
+        </button>
+      `;
+
+      billContainer.innerHTML = billHTML;
+    }
+
+    function printBill() {
+      const billContent = document.getElementById("billContainer").innerHTML;
+      const printWindow = window.open("", "", "height=600,width=800");
+      printWindow.document.write("<html><head><title>Print Bill</title>");
+      printWindow.document.write(
+        '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">'
+      );
+      printWindow.document.write(
+        `<style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+          .bill-header h2 { text-align: center; }
+          .bill-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          .bill-table th, .bill-table td { border: 1px solid #e0e0e0; padding: 10px; }
+          .total { text-align: right; font-size: 1.5em; margin-top: 20px; }
+          p { text-align: center; color: #7f8c8d; }
+        </style>`
+      );
+      printWindow.document.write("</head><body>");
+      printWindow.document.write(billContent);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+
+    // Logout Function
+    function logout() {
+      window.location.href = 'Login2.html';
+    }
+  </script>
+</body>
+</html>
